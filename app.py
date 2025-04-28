@@ -1,6 +1,7 @@
 import streamlit as st
 import PyPDF2
 import re
+import time
 
 def extract_text_from_pdf(uploaded_file):
     pdf_reader = PyPDF2.PdfReader(uploaded_file)
@@ -27,8 +28,29 @@ uploaded_resume = st.file_uploader("Upload your Resume (PDF)", type="pdf")
 job_description = st.text_area("Paste the Job Description")
 
 if uploaded_resume and job_description:
-    resume_text = extract_text_from_pdf(uploaded_resume)
-    match_percent = calculate_match(resume_text, job_description)
-    st.subheader(f"🎯 Match Percentage: {match_percent}%")
+    with st.spinner('Analyzing...'):
+        time.sleep(2) 
+        
+        resume_text = extract_text_from_pdf(uploaded_resume)
+        match_percent = calculate_match(resume_text, job_description)
+        
+        st.subheader(f"🎯 Match Percentage: {match_percent}%")
+
+        progress_bar = st.progress(0)
+        for percent_complete in range(int(match_percent) + 1):
+            time.sleep(0.01)
+            progress_bar.progress(percent_complete)
+
+        if match_percent >= 80:
+            st.balloons()
+
+        if match_percent >= 80:
+            st.success("Amazing match! 🚀 You are ready to apply!")
+        elif match_percent >= 50:
+            st.info("Good match, but consider tweaking your resume a bit!")
+        else:
+            st.warning("Low match. You might want to tailor your resume more carefully.")
+
+
 
 
